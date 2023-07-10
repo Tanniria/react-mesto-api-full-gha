@@ -1,0 +1,22 @@
+.auth__login {
+    width: 100%;
+    min-height: 17px;
+    margin-top: 15px;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 17px;
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.auth__login:hover {
+    opacity: 0.6;
+}
+
+@media screen and (max-width: 900px) {
+    .auth__login {
+        margin-top: 20px;
+    };
+}

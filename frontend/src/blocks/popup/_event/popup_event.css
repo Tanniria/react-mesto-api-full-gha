@@ -1,0 +1,5 @@
+.popup_event {
+    display: flex;
+    flex-direction:column-reverse;
+    align-items: center;
+}

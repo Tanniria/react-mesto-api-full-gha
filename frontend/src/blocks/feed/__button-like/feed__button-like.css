@@ -1,0 +1,14 @@
+.feed__button-like {
+    width: 22px;
+    height: 19px;
+    margin: 0;
+    padding: 0;
+    background: url('../../../images/like.svg') no-repeat;
+    border: none;
+    cursor: pointer;
+    align-self: center;
+    transition: .3s linear;
+}
+.feed__button-like:hover {
+    opacity: 0.5;
+}

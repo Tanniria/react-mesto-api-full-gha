@@ -1,0 +1,8 @@
+.feed__overview {
+    padding: 25px 0 25px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #000000;
+    background-color: #fff;
+}

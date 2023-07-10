@@ -1,0 +1,30 @@
+.profile__container-avatar {
+    margin: 0 30px 0 0;
+    position: relative;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+}
+.profile__container-avatar::before {
+    content: '';
+    position: absolute;
+    display: block;
+    top: 0;
+    left: 0;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 26px 26px;
+    cursor: pointer;
+    z-index: 1;
+    transition: .4s linear;
+}
+.profile__container-avatar:hover::before {
+    background-image: url('../../../images/pen.png');
+    background-color: rgba(0, 0, 0, 0.8);
+}
+@media (max-width: 690px) {
+    .profile__container-avatar {
+        margin-right: 0;
+        margin-bottom: 26px;
+    }
+}

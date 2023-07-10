@@ -1,0 +1,10 @@
+.feed__title {
+    margin: 0;
+    padding: 0 0 0 21px;
+    font-size: 24px;
+    font-weight: 900;
+    line-height: 29px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}

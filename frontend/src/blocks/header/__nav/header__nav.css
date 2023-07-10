@@ -1,0 +1,9 @@
+.header__nav {
+    display: flex;
+}
+
+@media screen and (max-width: 500px) {
+    .header__nav {
+        justify-content: space-between;
+    }
+}

@@ -1,0 +1,16 @@
+.profile__form {
+    width: 100%;
+    margin: 22px 0 25px 30px;
+}
+@media screen and (max-width: 768px) {
+    .profile__form {
+        max-width: 282px;
+    }
+}
+@media screen and (max-width: 320px) {
+    .profile__form {
+        margin: 0;
+        max-width: 250px;
+        padding: 20px 0 31px 0;
+    }
+}

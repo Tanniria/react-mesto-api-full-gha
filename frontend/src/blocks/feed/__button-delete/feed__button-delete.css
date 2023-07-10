@@ -1,0 +1,12 @@
+.feed__button-delete {
+    background: url('../../../images/delete.svg') no-repeat;
+    border: none;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 18px;
+    height: 19px;
+}
+.feed__button-delete:hover {
+    opacity: 0.6;
+}
