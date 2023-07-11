@@ -1,8 +1,8 @@
 const allowedCors = [
-  'http://another.domainname.st.nomoredomains.work/',
-  'https://another.domainname.st.nomoredomains.work/',
-  'http://localhost:3001',
-  'https://localhost:3001',
+  'http://another.domainname.studen.nomoredomains.work/',
+  'https://another.domainname.studen.nomoredomains.work/',
+  'http://localhost:3000',
+  'https://localhost:3000',
 ];
 
 const DEFAULT_ALLOWED_METHODS = 'GET,HEAD,PUT,PATCH,POST,DELETE';
