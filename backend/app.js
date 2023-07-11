@@ -26,7 +26,8 @@ app.use(express.json());
 app.use(requestLogger);
 app.use(limiter);
 app.use(helmet());
-app.use(cors);
+app.use(cors());
+app.options('*', cors());
 
 mongoose.connect(DB_URL);
 
