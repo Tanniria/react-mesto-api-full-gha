@@ -1,6 +1,7 @@
 import React, { useContext, useRef, useEffect } from 'react';
 import PopupWithForm from './PopupWithForm';
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
+import { useFormAndValidation } from '../hooks/useFormAndValidation';
 
 export default function EditAvatarPopup({
     isOpen,
@@ -10,6 +11,8 @@ export default function EditAvatarPopup({
 }) {
     const currentUser = useContext(CurrentUserContext);
     const avatarRef = useRef(currentUser.avatar);
+    
+    const {values, handleChange, errors, isValid, setValues, resetForm} = useFormAndValidation()
 
     function handleSubmit(evt) {
         evt.preventDefault();
@@ -18,8 +21,9 @@ export default function EditAvatarPopup({
         })
     };
     useEffect(() => {
+        resetForm()
         avatarRef.current.value = '';
-    }, [isOpen]);
+    }, [isOpen, resetForm]);
 
     return (
         <PopupWithForm
@@ -28,7 +32,9 @@ export default function EditAvatarPopup({
             buttonText={isLoading ? 'Сохранение...' : 'Сохранить'}
             isOpen={isOpen}
             onClose={onClose}
-            onSubmit={handleSubmit}>
+            onSubmit={handleSubmit}
+            isValid={isValid}
+            >
             <label>
                 <input
                     className="popup__input popup__input_value_avatar"
@@ -41,7 +47,7 @@ export default function EditAvatarPopup({
                 />
                 <span
                     className="popup__input-error"
-                    id="avatar__input-error"></span>
+                    id="avatar__input-error">{errors.avatar || ''}</span>
             </label>
         </PopupWithForm>
     );

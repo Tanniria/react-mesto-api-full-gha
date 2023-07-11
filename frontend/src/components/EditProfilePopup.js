@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from 'react'
 import PopupWithForm from './PopupWithForm';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
-import { useForm } from '../hooks/useForm';
+import { useFormAndValidation } from '../hooks/useForm';
 
 export default function EditProfilePopup({
     isOpen,
@@ -10,15 +10,13 @@ export default function EditProfilePopup({
     isLoading
 }) {
     const currentUser = useContext(CurrentUserContext);
-    const { values, handleChange, setValues } = useForm({});
+    const {values, handleChange, errors, isValid, setValues, resetForm} = useFormAndValidation()
 
     useEffect(() => {
-        isOpen &&
-            setValues({
-                name: currentUser.name,
-                job: currentUser.about,
-            });
-    }, [currentUser, isOpen]);
+        if(currentUser) {
+            resetForm(currentUser);
+        }
+    }, [currentUser, resetForm, isOpen]);
 
     function handleSubmit(evt) {
         evt.preventDefault();
@@ -32,7 +30,9 @@ export default function EditProfilePopup({
             buttonText={isLoading ? 'Сохранение...' : 'Сохранить'}
             isOpen={isOpen}
             onClose={onClose}
-            onSubmit={handleSubmit} >
+            onSubmit={handleSubmit}
+            isValid={isValid}
+            >
             <label>
                 <input
                     className="popup__input popup__input_value_name"
@@ -47,7 +47,8 @@ export default function EditProfilePopup({
                     value={values.name || ''} />
                 <span
                     className="popup__input-error"
-                    id="name__input-error"></span>
+                    id="name__input-error">{errors.name || ''}
+                    </span>
             </label>
             <label>
                 <input
@@ -63,7 +64,8 @@ export default function EditProfilePopup({
                     value={values.job || ''} />
                 <span
                     className="popup__input-error"
-                    id="job__input-error"></span>
+                    id="job__input-error">{errors.job || ''}
+                    </span>
             </label>
         </PopupWithForm>
     );
