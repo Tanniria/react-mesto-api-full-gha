@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import PopupWithForm from './PopupWithForm';
-import { useFormAndValidation } from '../hooks/useFormAndValidation';
+import { useForm } from '../hooks/useForm';
 
 export default function AddPlacePopup({
     isOpen,
@@ -8,11 +8,11 @@ export default function AddPlacePopup({
     onAddPlace,
     isLoading
 }) {
-    const {values, handleChange, errors, isValid, setValues, resetForm} = useFormAndValidation()
+    const { values, handleChange, setValues } = useForm({});
 
     useEffect(() => {
-        resetForm();
-    }, [isOpen, resetForm]);
+        setValues({});
+    }, [isOpen]);
    
     function handleSubmit(evt) {
         evt.preventDefault();
@@ -28,7 +28,6 @@ export default function AddPlacePopup({
             isOpen={isOpen}
             onClose={onClose}
             onSubmit={handleSubmit}
-            isValid={isValid}
         >
             <label>
                 <input
@@ -45,7 +44,7 @@ export default function AddPlacePopup({
                 />
                 <span
                     className="popup__input-error"
-                    id="title__input-error">{errors.name || ''}
+                    id="title__input-error">
                 </span>
             </label>
             <label>
@@ -60,7 +59,7 @@ export default function AddPlacePopup({
                     value={values.link || ''} />
                 <span
                     className="popup__input-error"
-                    id="link__input-error">{errors.link || ''}
+                    id="link__input-error">
                 </span>
             </label>
         </PopupWithForm>
