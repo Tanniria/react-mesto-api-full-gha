@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from 'react'
 import PopupWithForm from './PopupWithForm';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
-import { useFormAndValidation } from '../hooks/useForm';
+import { useFormAndValidation } from '../hooks/useFormAndValidation';
 
 export default function EditProfilePopup({
     isOpen,
