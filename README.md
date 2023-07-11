@@ -27,7 +27,7 @@
 
 ## Ссылки на проект
 
-IP-адрес <51.250.95.135>
+IP 51.250.95.135
 
 Frontend https://another.domainname.studen.nomoredomains.work/
 
