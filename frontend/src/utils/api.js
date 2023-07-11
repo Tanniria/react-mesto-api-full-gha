@@ -108,7 +108,7 @@ class Api {
 };
 
 const api = new Api({
-    url: 'https://api.another.domainname.st.nomoredomains.work',
+    url: 'https://another.domainname.studen.nomoredomains.work',
 });
 
 export default api;
