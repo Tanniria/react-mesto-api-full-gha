@@ -114,18 +114,17 @@ export default function App() {
     function handleLogin(email, password) {
         auth
             .login(email, password)
-            .then((data) => {
-                if (data.token) {
-                    handleTokenCheck();
-                    setLoggedIn(true);
-                    navigate("/", { replace: true });
-                }
+            .then((res) => {
+                localStorage.setItem('jwt', res.token);
+                setLoggedIn(true);
+                setUserEmail(email);
+                navigate('/');
             })
             .catch((err) => {
                 setRegistrationSuccess(false);
-                handleInfoTooltipClick(true);
                 console.log(`Ошибка: ${err}`);
             })
+            handleInfoTooltipClick(true);
     }
 
     function handleTokenCheck() {
