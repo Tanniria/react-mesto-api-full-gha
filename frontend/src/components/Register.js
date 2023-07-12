@@ -35,7 +35,7 @@ export default function Register({ onRegister }) {
                     required
                     autoComplete="off"
                     onChange={handleChange}
-                    value={registrationUserInfo.email} />
+                    value={registrationUserInfo.email || ''} />
                 <span
                     className="popup__input-error"
                     id="email__input-error"></span>
@@ -48,7 +48,7 @@ export default function Register({ onRegister }) {
                     minLength="7"
                     maxLength="40"
                     onChange={handleChange}
-                    value={registrationUserInfo.password}
+                    value={registrationUserInfo.password || ''}
                 />
                 <span
                     className="popup__input-error"

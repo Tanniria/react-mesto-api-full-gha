@@ -31,8 +31,7 @@ export default function App() {
     const [currentUser, setCurrentUser] = useState({});
     const [cards, setCards] = useState([]);
     const [userEmail, setUserEmail] = useState('');
-    const [valueRegister, setValueRegister] = useState({});
-    const [valueLogin, setValueLogin] = useState({});
+
 
     const navigate = useNavigate();
 
@@ -66,70 +65,97 @@ export default function App() {
     };
 
     useEffect(() => {
-        if (loggedIn) {
-            Promise.all([api.getUserInfo(), api.getInitialCardsApi()])
-                .then(([user, card]) => {
-                    setCurrentUser(user);
-                    setCards(card.reverse());
-                })
-                .catch((err) => console.log(err));
-        }
-    }, [loggedIn]);
-
-    function handleRegistration() {
-        if (valueRegister.password || valueRegister.email) {
-            auth
-                .register(valueRegister)
-                .then(() => {
-                    handleInfoTooltipClick(true);
-                    navigate('/sign-in', { replace: true });
-                    setValueRegister({});
+        loggedIn &&
+            api
+                .getInfo()
+                .then(([initialCards, userData]) => {
+                    setCards(initialCards);
+                    setCurrentUser(userData);
                 })
                 .catch((err) => {
                     console.log(err);
-                    return handleInfoTooltipClick(false);
-                });
-        }
-    }
-
-    function handleLogin() {
-        if (!valueLogin.email || !valueLogin.password) {
-            return;
-        }
-        auth
-            .login(valueLogin)
-            .then(() => {
-                navigate('/', { replace: true });
-                setLoggedIn(true);
-                setValueLogin({});
-                setUserEmail(valueLogin.email);
-            })
-            .catch((err) => {
-                setRegistrationSuccess(false);
-                handleInfoTooltipClick(true);
-                console.log(`Ошибка: ${err}`);
-            })
-    }
-
-    function handleTokenCheck() {
-        const token = localStorage.getItem('token');
-        if (token) {
-            auth
-                .checkToken()
-                .then((res) => {
-                    if (res) {
-                        setLoggedIn(true);
-                        navigate('/', { replace: true });
-                    }
                 })
-                .catch((err) => console.log(err));
-        }
-    }
+    }, [loggedIn]);
 
     useEffect(() => {
         handleTokenCheck();
     }, []);
 
+    const handleRegistration = (data) => {
+        return auth
+            .register(data)
+            .then((res) => {
+                console.log(res);
+                setRegistrationSuccess(true);
+                handleInfoTooltipClick();
+                navigate('/signin', { replace: true });
+            })
+            .catch((err) => {
+                console.log(`Что-то пошло не так: ${err}`);
+                setRegistrationSuccess(false);
+            })
+            .finally(() => {
+                handleInfoTooltipClick();
+            });
+    };
+
+    const handleLogin = (data) => {
+        return auth
+            .login(data)
+            .then((data) => {
+                setLoggedIn(true);
+                //при запросе авторизации проверяет токен, который возвращает email пользователя
+                auth.checkToken(data.token).then((res) => {
+                    setUserEmail(res.email);
+                });
+                localStorage.setItem('token', data.token);
+                navigate('/', { replace: true });
+            })
+            .catch((err) => {
+                console.log(`Что-то пошло не так: ${err}`);
+                setLoggedIn(false);
+                setRegistrationSuccess(false);
+                handleInfoTooltipClick();
+            })
+    };
+
+    const handleTokenCheck = () => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            // проверим токен
+            auth
+                .checkToken(token)
+                .then((res) => {
+                    if (res) {
+                        //при перезагрузке без данного свойства email теряется
+                        setUserEmail(res.email);
+                        setLoggedIn(true);
+                        navigate('/', { replace: true });
+                    }
+                })
+                .catch((err) => {
+                    console.log(`Что-то пошло не так: ${err}`);
+                })
+        }
+    };
+
+    const handleSingOut = () => {
+        localStorage.removeItem('token');
+        navigate('/signin', { replace: true });
+        setLoggedIn(false);
+    };
+
+
+    // useEffect(() => {
+    //     if (loggedIn) {
+    //         Promise.all([api.getUserInfo(), api.getInitialCardsApi()])
+    //             .then(([user, card]) => {
+    //                 setCurrentUser(user);
+    //                 setCards(card.reverse());
+    //             })
+    //             .catch((err) => console.log(err));
+    //     }
+    // }, [loggedIn]);
 
     // function handleRegistration(email, password) {
     //     auth
@@ -190,12 +216,12 @@ export default function App() {
     //     loggedIn && navigate('/');
     // }, [loggedIn])
 
-    function handleSingOut() {
-        localStorage.removeItem("token");
-        setLoggedIn(false);
-        setUserEmail("");
-        navigate("/sign-in");
-    }
+    // function handleSingOut() {
+    //     localStorage.removeItem("token");
+    //     setLoggedIn(false);
+    //     setUserEmail("");
+    //     navigate("/sign-in");
+    // }
 
     function handleUpdateUser(data) {
         setIsLoading(true);
