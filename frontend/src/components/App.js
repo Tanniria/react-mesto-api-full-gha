@@ -123,8 +123,11 @@ export default function App() {
             })
             .catch((err) => {
                 setRegistrationSuccess(false);
-                handleInfoTooltipClick(true);
+                // handleInfoTooltipClick(true);
                 console.log(`Ошибка: ${err}`);
+            })
+            .finally(() => {
+                handleInfoTooltipClick(true);
             })
     }
 
