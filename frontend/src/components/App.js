@@ -31,20 +31,39 @@ export default function App() {
     const [currentUser, setCurrentUser] = useState({});
     const [cards, setCards] = useState([]);
     const [userEmail, setUserEmail] = useState('');
+
     const navigate = useNavigate();
 
+    // useEffect(() => {
+    //     if (loggedIn) {
+    //         Promise.all([api.getUserInfo(), api.getInitialCards()])
+    //             .then(([userInfo, cards]) => {
+    //                 setCurrentUser(userInfo);
+    //                 setCards(cards);
+    //             })
+    //             .catch((err) => {
+    //                 console.log(`Ошибка: ${err}`)
+    //             })
+    //     }
+    // }, [loggedIn]);
+
     useEffect(() => {
-        if (loggedIn) {
-            Promise.all([api.getUserInfo(), api.getInitialCards()])
-                .then(([userInfo, cards]) => {
-                    setCurrentUser(userInfo);
-                    setCards(cards);
-                })
-                .catch((err) => {
-                    console.log(`Ошибка: ${err}`)
-                })
+        const token = localStorage.getItem("jwt");
+        if (token) {
+          if(loggedIn) {
+            api
+              .getInfo()
+              .then(([userInfo, card]) => {
+                setCurrentUser(userInfo);
+                setCards(card.reverse());
+              })
+              .catch((err) => {
+                console.log(err);
+              });
+          }
         }
-    }, [loggedIn]);
+      }, [loggedIn]);
+    
 
     function handleEditProfileClick() {
         setIsEditProfilePopupOpen(true);
@@ -75,29 +94,32 @@ export default function App() {
         setIsInfoTooltipPopupOpen(false);
     };
 
-    function handleRegistration(data) {
-        return auth
-            .register(data)
-            .then((data) => {
+    function handleRegistration(email, password) {
+        auth
+            .register(email, password)
+            .then((res) => {
                 setRegistrationSuccess(true);
                 handleInfoTooltipClick();
-                navigate("/sign-in")
+                navigate("/sign-in", { replace: true });
             })
             .catch((err) => {
                 setRegistrationSuccess(false);
-                handleInfoTooltipClick(true);
                 console.log(`Ошибка: ${err}`);
+            })
+            .finally(() => {
+                handleInfoTooltipClick(true);
             })
     }
 
-    function handleLogin(data) {
-        return auth
-            .login(data)
+    function handleLogin(email, password) {
+        auth
+            .login(email, password)
             .then((data) => {
-                localStorage.setItem("jwt", data.token);
-                setLoggedIn(true);
-                handleTokenCheck();
-                navigate("/");
+                if (data.token) {
+                    handleTokenCheck();
+                    setLoggedIn(true);
+                    navigate("/", { replace: true });
+                }
             })
             .catch((err) => {
                 setRegistrationSuccess(false);
@@ -115,6 +137,7 @@ export default function App() {
                     if (res) {
                         setLoggedIn(true);
                         setUserEmail(res.data.email)
+                        navigate('/', { replace: true });
                     }
                 })
                 .catch((err) => {
@@ -124,13 +147,11 @@ export default function App() {
     }
     useEffect(() => {
         handleTokenCheck();
-    }, []);
+    }, [navigate]);
 
     useEffect(() => {
-        if (loggedIn) {
-          navigate("/");
-        }
-      }, [loggedIn, navigate]);
+        loggedIn && navigate('/');
+    }, [loggedIn])
 
     function handleSingOut() {
         localStorage.removeItem("jwt");

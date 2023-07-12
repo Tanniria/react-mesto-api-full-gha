@@ -12,6 +12,10 @@ class Api {
         return fetch(url, options).then(this._checkResponse)
     };
 
+    getInfo() {
+        return Promise.all([this.getUserInfo(), this.getInitialCards()])
+    };
+
     getInitialCards() {
         const token = localStorage.getItem('token');
         return fetch(`${this._url}/cards`, {
