@@ -28,13 +28,6 @@ export const login = (email, password) => {
         body: JSON.stringify({ email, password })
     })
         .then((res) => checkResponse(res))
-        .then((data) => {
-            if (data.token) {
-                localStorage.setItem('token', data.token);
-                return data;
-            }
-            return Promise.reject(`Ошибка ${data.status}`)
-        })
 };
 export const checkToken = (token) => {
     return fetch(`${BASE_URL}/users/me`, {
