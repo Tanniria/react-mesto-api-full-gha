@@ -30,6 +30,7 @@ export default function App() {
     const [selectedCard, setSelectedCard] = useState({});
     const [currentUser, setCurrentUser] = useState({});
     const [cards, setCards] = useState([]);
+    const [addCard, setAddCard] = useState(false);
     const [userEmail, setUserEmail] = useState('');
 
     const navigate = useNavigate();
@@ -76,22 +77,62 @@ export default function App() {
     //     }
     // }, [loggedIn]);
 
+    // useEffect(() => {
+    //     const token = localStorage.getItem("token");
+    //     if (token) {
+    //         if (loggedIn) {
+    //             api
+    //                 .getInfo()
+    //                 .then(([userInfo, card]) => {
+    //                     setCurrentUser(userInfo);
+    //                     setCards(card.reverse());
+    //                 })
+    //                 .catch((err) => {
+    //                     console.log(err);
+    //                 });
+    //         }
+    //     }
+    // }, [loggedIn]);
     useEffect(() => {
         const token = localStorage.getItem("token");
         if (token) {
-            if (loggedIn) {
-                api
-                    .getInfo()
-                    .then(([userInfo, card]) => {
-                        setCurrentUser(userInfo);
-                        setCards(card.reverse());
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                    });
-            }
+            auth
+                .checkToken(token)
+                .then(res => {
+                    if (res) {
+                        setLoggedIn(true)
+                        setUserEmail(res.email)
+                    }
+                    navigate("/", { replace: true });
+                })
+                .catch(err => {
+                    console.log(err);
+                })
         }
-    }, [loggedIn]);
+    });
+
+    useEffect(() => {
+        if (loggedIn) {
+            api
+                .getUserInfo()
+                .then((userInfo) => {
+                    setCurrentUser(userInfo)
+                })
+                .catch((err) => {
+                    console.log(err);
+                })
+
+            api
+                .getCards()
+                .then((cards) => {
+                    setCards(cards)
+                })
+                .catch((err) => {
+                    console.log(err);
+                })
+        }
+
+    }, [loggedIn, addCard]);
 
     // function handleRegistration(email, password) {
     //     auth
@@ -115,25 +156,27 @@ export default function App() {
     function handleRegistration(email, password) {
         auth
             .register(email, password)
-            .then((res) => {
-                navigate("/sign-in", { replace: true });
-                setRegistrationSuccess(true);
+            .then(res => {
+                if (res) {
+                    setRegistrationSuccess(true);
+                    handleInfoTooltipClick(true);
+                    navigate("/sign-in", { replace: true });
+                }
             })
             .catch((err) => {
                 setRegistrationSuccess(false);
+                handleInfoTooltipClick(true);
                 console.log(`Ошибка: ${err}`);
             })
-            .finally(() => {
-                handleInfoTooltipClick(true);
-            })
     }
+
     function handleLogin(email, password) {
         auth
             .login(email, password)
-            .then((data) => {
-                if (data.token) {
-                    handleTokenCheck();
+            .then(res => {
+                if (res) {
                     setLoggedIn(true);
+                    localStorage.setItem('token', res.token);
                     navigate("/", { replace: true });
                 }
             })
@@ -144,33 +187,33 @@ export default function App() {
             })
     }
 
-    function handleTokenCheck() {
-        const token = localStorage.getItem("token");
-        if (token) {
-            auth
-                .checkToken(token)
-                .then((res) => {
-                    if (res) {
-                        setLoggedIn(true);
-                        setUserEmail(res.email)
-                        navigate('/', { replace: true });
-                    }
-                })
-                .catch((err) => {
-                    console.log(`Ошибка: ${err}`);
-                })
-        }
-    }
-    useEffect(() => {
-        handleTokenCheck();
-    }, [navigate]);
+    // function handleTokenCheck() {
+    //     const token = localStorage.getItem("token");
+    //     if (token) {
+    //         auth
+    //             .checkToken(token)
+    //             .then((res) => {
+    //                 if (res) {
+    //                     setLoggedIn(true);
+    //                     setUserEmail(res.email)
+    //                     navigate('/', { replace: true });
+    //                 }
+    //             })
+    //             .catch((err) => {
+    //                 console.log(`Ошибка: ${err}`);
+    //             })
+    //     }
+    // }
+    // useEffect(() => {
+    //     handleTokenCheck();
+    // }, [navigate]);
 
-    useEffect(() => {
-        loggedIn && navigate('/');
-    }, [loggedIn])
+    // useEffect(() => {
+    //     loggedIn && navigate('/');
+    // }, [loggedIn])
 
     function handleSingOut() {
-        localStorage.removeItem("jwt");
+        localStorage.removeItem("token");
         setLoggedIn(false);
         setUserEmail("");
         navigate("/sign-in");
