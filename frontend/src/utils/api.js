@@ -27,6 +27,7 @@ class Api {
         })
             .then((res) => this._checkResponse(res));
     };
+
     getUserInfo() {
         const token = localStorage.getItem('token');
         return this._request(`${this._url}/users/me`, {
@@ -36,6 +37,7 @@ class Api {
                 'Content-Type': 'application/json'
             },
         })
+            .then((res) => this._checkResponse(res));
     };
     editUserInfo(data) {
         const token = localStorage.getItem('token');
@@ -50,6 +52,7 @@ class Api {
                 about: data.job,
             }),
         })
+            .then((res) => this._checkResponse(res));
     };
     editAvatar(data) {
         const token = localStorage.getItem('token');
@@ -63,6 +66,7 @@ class Api {
                 avatar: data.avatar,
             }),
         })
+            .then((res) => this._checkResponse(res));
     };
     addCard(data) {
         const token = localStorage.getItem('token');
@@ -77,6 +81,7 @@ class Api {
                 link: data.link,
             }),
         })
+            .then((res) => this._checkResponse(res));
     };
     deleteCard(cardId) {
         const token = localStorage.getItem('token');
@@ -87,6 +92,7 @@ class Api {
                 'Content-Type': 'application/json'
             },
         })
+            .then((res) => this._checkResponse(res));
     };
     changeLikeCardStatus(cardId, isLiked) {
         if (isLiked) {
@@ -96,7 +102,8 @@ class Api {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json'
-                },
+                }
+                .then((res) => this._checkResponse(res))
             })
         } else {
             const token = localStorage.getItem('token');
@@ -107,9 +114,10 @@ class Api {
                     'Content-Type': 'application/json'
                 },
             })
-        };
-    };
-};
+            .then((res) => this._checkResponse(res));
+        }
+    }
+}
 
 const api = new Api({
     url: 'https://api.another.domainname.st.nomoredomains.work',

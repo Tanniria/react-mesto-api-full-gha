@@ -7,7 +7,7 @@ function checkResponse(res) {
     return Promise.reject(`Ошибка: ${res.status}`);
 };
 
-export function register({ email, password }) {
+export const register = (email, password) => {
     return fetch(`${BASE_URL}/signup`, {
         method: 'POST',
         headers: {
@@ -18,7 +18,7 @@ export function register({ email, password }) {
     })
         .then((res) => checkResponse(res));
 };
-export function login({ email, password }) {
+export const login = (email, password) => {
     return fetch(`${BASE_URL}/signin`, {
         method: 'POST',
         headers: {
@@ -27,9 +27,16 @@ export function login({ email, password }) {
         },
         body: JSON.stringify({ email, password })
     })
-        .then((res) => checkResponse(res));
+        .then((res) => checkResponse(res))
+        .then((data) => {
+            if (data.token) {
+                localStorage.setItem('token', data.token);
+                return data;
+            }
+            return Promise.reject(`Ошибка ${data.status}`)
+        })
 };
-export function checkToken(token) {
+export const checkToken = (token) => {
     return fetch(`${BASE_URL}/users/me`, {
         method: 'GET',
         headers: {
