@@ -30,8 +30,9 @@ export default function App() {
     const [selectedCard, setSelectedCard] = useState({});
     const [currentUser, setCurrentUser] = useState({});
     const [cards, setCards] = useState([]);
-    const [addCard, setAddCard] = useState(false);
     const [userEmail, setUserEmail] = useState('');
+    const [valueRegister, setValueRegister] = useState({});
+    const [valueLogin, setValueLogin] = useState({});
 
     const navigate = useNavigate();
 
@@ -64,128 +65,105 @@ export default function App() {
         setIsInfoTooltipPopupOpen(false);
     };
 
-    // useEffect(() => {
-    //     if (loggedIn) {
-    //         Promise.all([api.getUserInfo(), api.getInitialCards()])
-    //             .then(([userInfo, cards]) => {
-    //                 setCurrentUser(userInfo);
-    //                 setCards(cards);
-    //             })
-    //             .catch((err) => {
-    //                 console.log(`Ошибка: ${err}`)
-    //             })
-    //     }
-    // }, [loggedIn]);
-
-    // useEffect(() => {
-    //     const token = localStorage.getItem("token");
-    //     if (token) {
-    //         if (loggedIn) {
-    //             api
-    //                 .getInfo()
-    //                 .then(([userInfo, card]) => {
-    //                     setCurrentUser(userInfo);
-    //                     setCards(card.reverse());
-    //                 })
-    //                 .catch((err) => {
-    //                     console.log(err);
-    //                 });
-    //         }
-    //     }
-    // }, [loggedIn]);
-    useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (token) {
-            auth
-                .checkToken(token)
-                .then(res => {
-                    if (res) {
-                        setLoggedIn(true)
-                        setUserEmail(res.email)
-                    }
-                    navigate("/", { replace: true });
-                })
-                .catch(err => {
-                    console.log(err);
-                })
-        }
-    });
-
     useEffect(() => {
         if (loggedIn) {
-            api
-                .getUserInfo()
-                .then((userInfo) => {
-                    setCurrentUser(userInfo)
+            Promise.all([api.getUserInfo(), api.getInitialCardsApi()])
+                .then(([user, card]) => {
+                    setCurrentUser(user);
+                    setCards(card.reverse());
                 })
-                .catch((err) => {
-                    console.log(err);
-                })
-
-            api
-                .getCards()
-                .then((cards) => {
-                    setCards(cards)
-                })
-                .catch((err) => {
-                    console.log(err);
-                })
+                .catch((err) => console.log(err));
         }
+    }, [loggedIn]);
 
-    }, [loggedIn, addCard]);
+    function handleRegistration() {
+        if (valueRegister.password || valueRegister.email) {
+            auth
+                .register(valueRegister)
+                .then(() => {
+                    handleInfoTooltipClick(true);
+                    navigate('/sign-in', { replace: true });
+                    setValueRegister({});
+                })
+                .catch((err) => {
+                    console.log(err);
+                    return handleInfoTooltipClick(false);
+                });
+        }
+    }
+
+    function handleLogin() {
+        if (!valueLogin.email || !valueLogin.password) {
+            return;
+        }
+        auth
+            .login(valueLogin)
+            .then(() => {
+                navigate('/', { replace: true });
+                setLoggedIn(true);
+                setValueLogin({});
+                setUserEmail(valueLogin.email);
+            })
+            .catch((err) => {
+                setRegistrationSuccess(false);
+                handleInfoTooltipClick(true);
+                console.log(`Ошибка: ${err}`);
+            })
+    }
+
+    function handleTokenCheck() {
+        const token = localStorage.getItem('token');
+        if (token) {
+            auth
+                .checkToken()
+                .then((res) => {
+                    if (res) {
+                        setLoggedIn(true);
+                        navigate('/', { replace: true });
+                    }
+                })
+                .catch((err) => console.log(err));
+        }
+    }
+
+    useEffect(() => {
+        handleTokenCheck();
+    }, []);
+
 
     // function handleRegistration(email, password) {
     //     auth
     //         .register(email, password)
-    //         .then((data) => {
-    //             if (data) {
+    //         .then(res => {
+    //             if (res) {
     //                 setRegistrationSuccess(true);
-    //                 handleInfoTooltipClick();
+    //                 handleInfoTooltipClick(true);
     //                 navigate("/sign-in", { replace: true });
     //             }
     //         })
     //         .catch((err) => {
     //             setRegistrationSuccess(false);
-    //             console.log(`Ошибка: ${err}`);
-    //         })
-    //         .finally(() => {
     //             handleInfoTooltipClick(true);
+    //             console.log(`Ошибка: ${err}`);
     //         })
     // }
 
-    function handleRegistration(email, password) {
-        auth
-            .register(email, password)
-            .then(res => {
-                if (res) {
-                    setRegistrationSuccess(true);
-                    handleInfoTooltipClick(true);
-                    navigate("/sign-in", { replace: true });
-                }
-            })
-            .catch((err) => {
-                setRegistrationSuccess(false);
-                handleInfoTooltipClick(true);
-                console.log(`Ошибка: ${err}`);
-            })
-    }
-
-    function handleLogin(email, password) {
-        auth
-            .login(email, password)
-            .then(res => {
-                if (res) {
-                    setLoggedIn(true);
-                    localStorage.setItem('token', res.token);
-                    navigate("/", { replace: true });
-                }
-            })
-            .catch((err) => {
-                setRegistrationSuccess(false);
-                handleInfoTooltipClick(true);
-                console.log(`Ошибка: ${err}`);
-            })
-    }
+    // function handleLogin(email, password) {
+    //     auth
+    //         .login(email, password)
+    //         .then(res => {
+    //             if (res) {
+    //                 setLoggedIn(true);
+    //                 localStorage.setItem('token', res.token);
+    //                 navigate("/", { replace: true });
+    //             }
+    //         })
+    //         .catch((err) => {
+    //             setRegistrationSuccess(false);
+    //             handleInfoTooltipClick(true);
+    //             console.log(`Ошибка: ${err}`);
+    //         })
+    // }
 
     // function handleTokenCheck() {
     //     const token = localStorage.getItem("token");
