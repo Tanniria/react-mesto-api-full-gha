@@ -26,9 +26,15 @@ export const login = (email, password) => {
         body: JSON.stringify({ email, password })
     })
         .then((res) => checkResponse(res))
+        .then((data) => {
+            if (data.token) {
+                localStorage.setItem("token", data.token);
+                return data;
+            }
+        })
 };
-export const checkToken = () => {
-    const token = localStorage.getItem('token');
+
+export const checkToken = (token) => {
     return fetch(`${BASE_URL}/users/me`, {
         method: 'GET',
         headers: {
@@ -36,5 +42,6 @@ export const checkToken = () => {
             'Authorization': `Bearer ${token}`,
         },
     })
-        .then((res) => checkResponse(res));
+        .then((res) => checkResponse(res))
+        .then((data) => data);
 };
