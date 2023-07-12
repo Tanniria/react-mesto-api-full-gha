@@ -34,36 +34,36 @@ export default function App() {
 
     const navigate = useNavigate();
 
-    // useEffect(() => {
-    //     if (loggedIn) {
-    //         Promise.all([api.getUserInfo(), api.getInitialCards()])
-    //             .then(([userInfo, cards]) => {
-    //                 setCurrentUser(userInfo);
-    //                 setCards(cards);
-    //             })
-    //             .catch((err) => {
-    //                 console.log(`Ошибка: ${err}`)
-    //             })
-    //     }
-    // }, [loggedIn]);
-
     useEffect(() => {
-        const token = localStorage.getItem("jwt");
-        if (token) {
-          if(loggedIn) {
-            api
-              .getInfo()
-              .then(([userInfo, card]) => {
-                setCurrentUser(userInfo);
-                setCards(card.reverse());
-              })
-              .catch((err) => {
-                console.log(err);
-              });
-          }
+        if (loggedIn) {
+            Promise.all([api.getUserInfo(), api.getInitialCards()])
+                .then(([userInfo, cards]) => {
+                    setCurrentUser(userInfo);
+                    setCards(cards);
+                })
+                .catch((err) => {
+                    console.log(`Ошибка: ${err}`)
+                })
         }
-      }, [loggedIn]);
-    
+    }, [loggedIn]);
+
+    // useEffect(() => {
+    //     const token = localStorage.getItem("jwt");
+    //     if (token) {
+    //       if(loggedIn) {
+    //         api
+    //           .getInfo()
+    //           .then(([userInfo, card]) => {
+    //             setCurrentUser(userInfo);
+    //             setCards(card.reverse());
+    //           })
+    //           .catch((err) => {
+    //             console.log(err);
+    //           });
+    //       }
+    //     }
+    //   }, [loggedIn]);
+
 
     function handleEditProfileClick() {
         setIsEditProfilePopupOpen(true);
@@ -97,10 +97,12 @@ export default function App() {
     function handleRegistration(email, password) {
         auth
             .register(email, password)
-            .then((res) => {
-                setRegistrationSuccess(true);
-                handleInfoTooltipClick();
-                navigate("/sign-in", { replace: true });
+            .then((data) => {
+                if (data) {
+                    setRegistrationSuccess(true);
+                    handleInfoTooltipClick();
+                    navigate("/sign-in", { replace: true });
+                }
             })
             .catch((err) => {
                 setRegistrationSuccess(false);
@@ -111,14 +113,17 @@ export default function App() {
             })
     }
 
-    function handleLogin(data) {
-        return auth
-            .login(data)
+    function handleLogin(email, password) {
+        auth
+            .login(email, password)
             .then((data) => {
-                localStorage.setItem("jwt", data.token);
-                setLoggedIn(true);
-                handleTokenCheck();
-                navigate("/");
+                if (data.token) {
+                    localStorage.setItem("jwt", data.token);
+                    setUserEmail(email);
+                    setLoggedIn(true);
+                    navigate("/", { replace: true });
+
+                }
             })
             .catch((err) => {
                 setRegistrationSuccess(false);
@@ -127,15 +132,15 @@ export default function App() {
             })
     }
 
-    function handleTokenCheck() {
+    useEffect(() => {
         const token = localStorage.getItem("jwt");
         if (token) {
             auth
                 .checkToken(token)
-                .then((res) => {
-                    if (res) {
+                .then((data) => {
+                    if (data) {
                         setLoggedIn(true);
-                        setUserEmail(res.data.email)
+                        setUserEmail(data.email);
                         navigate('/', { replace: true });
                     }
                 })
@@ -143,19 +148,37 @@ export default function App() {
                     console.log(`Ошибка: ${err}`);
                 })
         }
-    }
-    useEffect(() => {
-        handleTokenCheck();
-    }, [navigate]);
+    }, [navigate])
 
-    useEffect(() => {
-        loggedIn && navigate('/');
-    }, [loggedIn])
+    // function handleTokenCheck() {
+    //     const token = localStorage.getItem("jwt");
+    //     if (token) {
+    //         auth
+    //             .checkToken(token)
+    //             .then((res) => {
+    //                 if (res) {
+    //                     setLoggedIn(true);
+    //                     setUserEmail(res.data.email)
+    //                     navigate('/', { replace: true });
+    //                 }
+    //             })
+    //             .catch((err) => {
+    //                 console.log(`Ошибка: ${err}`);
+    //             })
+    //     }
+    // }
+    // useEffect(() => {
+    //     handleTokenCheck();
+    // }, [navigate]);
+
+    // useEffect(() => {
+    //     loggedIn && navigate('/');
+    // }, [loggedIn])
 
     function handleSingOut() {
         localStorage.removeItem("jwt");
         setLoggedIn(false);
-        setUserEmail('');
+        setUserEmail("");
         navigate("/sign-in");
     }
 
