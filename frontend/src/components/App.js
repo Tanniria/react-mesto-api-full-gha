@@ -32,7 +32,6 @@ export default function App() {
     const [cards, setCards] = useState([]);
     const [userEmail, setUserEmail] = useState('');
 
-
     const navigate = useNavigate();
 
     function handleEditProfileClick() {
@@ -63,6 +62,23 @@ export default function App() {
         setIsConfirmPopupOpen(false);
         setIsInfoTooltipPopupOpen(false);
     };
+    
+    useEffect(() => {
+        if (loggedIn) {
+            Promise.all([api.getUserInfo(), api.getInitialCards()])
+                .then(([userData, cardsData]) => {
+                    setCurrentUser(userData);
+                    setCards(cardsData);
+                })
+                .catch((err) => {
+                    console.log("Ошибка загрузки данных пользователя", err);
+                });
+        }
+    }, [loggedIn]);
+    
+    useEffect(() => {
+        handleTokenCheck()
+    }, []);
 
     function handleRegistration({ email, password }) {
         auth
@@ -97,20 +113,6 @@ export default function App() {
                 console.log("Ошибка входа", err);
             })
     }
-
-    useEffect(() => {
-        if (loggedIn) {
-            Promise.all([api.getUserInfo(), api.getInitialCards()])
-                .then(([userData, cardsData]) => {
-                    setCurrentUser(userData);
-                    setCards(cardsData);
-                })
-                .catch((err) => {
-                    console.log("Ошибка загрузки данных пользователя", err);
-                });
-        }
-    }, [loggedIn]);
-
     function handleTokenCheck() {
         const token = localStorage.getItem("token");
         if (token) {
@@ -127,17 +129,13 @@ export default function App() {
                     console.log("Ошибка валидности токена", err);
                 });
         }
-    }
-
-    useEffect(() => {
-        handleTokenCheck()
-    }, []);
+    };
 
     const handleSingOut = () => {
         setLoggedIn(false)
         localStorage.removeItem("token");
         navigate("/sign-in");
-    }
+    };
 
     function handleUpdateUser(data) {
         setIsLoading(true);

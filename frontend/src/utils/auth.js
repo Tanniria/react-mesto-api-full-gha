@@ -17,6 +17,7 @@ export const register = (email, password) => {
     })
         .then((res) => checkResponse(res));
 };
+
 export const login = (email, password) => {
     return fetch(`${BASE_URL}/signin`, {
         method: 'POST',
@@ -25,12 +26,13 @@ export const login = (email, password) => {
         },
         body: JSON.stringify({ email, password })
     })
-        .then((res) => checkResponse(res))
+        .then((response => response.json()))
         .then((data) => {
             if (data.token) {
                 localStorage.setItem("token", data.token);
                 return data;
             }
+            // return Promise.reject(`Ошибка ${data.status}`)
         })
 };
 
