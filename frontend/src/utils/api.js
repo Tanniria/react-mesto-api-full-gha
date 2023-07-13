@@ -14,7 +14,7 @@ class Api {
 
     getInitialCards() {
         const token = localStorage.getItem('jwt');
-        return fetch(`${this._url}/cards`, {
+        return this._request(`${this._url}/cards`, {
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${token}`,

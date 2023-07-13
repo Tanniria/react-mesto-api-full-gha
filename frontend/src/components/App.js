@@ -66,9 +66,12 @@ export default function App() {
     useEffect(() => {
         if (loggedIn) {
             Promise.all([api.getUserInfo(), api.getInitialCards()])
-                .then(([userData, cardsData]) => {
-                    setCurrentUser(userData);
-                    setCards(cardsData);
+                .then(([data, cards]) => {
+                    setCurrentUser(data.data);
+                    // setCards(data[0].data);
+                    if (cards.data) {
+                        setCards(cards.data);
+                    }
                 })
                 .catch((err) => {
                     console.log("Ошибка загрузки данных пользователя", err);
@@ -77,8 +80,17 @@ export default function App() {
     }, [loggedIn]);
 
     // useEffect(() => {
-    //     handleTokenCheck()
-    // }, []);
+    //     if (loggedIn) {
+    //       Promise.all([api.getUserInfo(), api.getInitialCards()])
+    //         .then(([user, cards]) => {
+    //           setCurrentUser(user);
+    //           setCards(cards);
+    //         })
+    //         .catch((err) => {
+    //           console.log(err);
+    //         });
+    //     }
+    //   }, [loggedIn]);
 
     function handleRegistration({ email, password }) {
         auth
@@ -89,30 +101,10 @@ export default function App() {
                 navigate("/sign-in", { replace: true });
             })
             .catch((err) => {
-                setRegistrationSuccess(false);
                 handleInfoTooltipClick();
                 console.log(`Что-то пошло не так: ${err}`);
             })
     };
-
-    // function handleLogin({ password, email }) {
-    //     auth
-    //         .login(password, email)
-    //         .then((data) => {
-    //             if (data.token) {
-    //                 setLoggedIn(true);
-    //                 setUserEmail(email);
-    //                 setRegistrationSuccess(true);
-    //                 handleInfoTooltipClick();
-    //                 navigate("/", { replace: true });
-    //             }
-    //         })
-    //         .catch((err) => {
-    //             setRegistrationSuccess(false);
-    //             handleInfoTooltipClick();
-    //             console.log("Ошибка входа", err);
-    //         })
-    // }
 
     function handleLogin(password, email) {
         auth
@@ -128,7 +120,7 @@ export default function App() {
                 setRegistrationSuccess(false);
                 console.log("Ошибка входа", err);
             })
-            handleInfoTooltipClick();
+        handleInfoTooltipClick();
     }
 
     useEffect(() => {
@@ -148,23 +140,11 @@ export default function App() {
         }
     })
 
-    // function handleTokenCheck() {
-    //     const token = localStorage.getItem("jwt");
-    //     if (token) {
-    //         auth
-    //             .checkToken(token)
-    //             .then((data) => {
-    //                 if (data) {
-    //                     setLoggedIn(true);
-    //                     setUserEmail(data.email);
-    //                     navigate("/", { replace: true });
-    //                 }
-    //             })
-    //             .catch((err) => {
-    //                 console.log("Ошибка валидности токена", err);
-    //             });
-    //     }
-    // };
+    useEffect(() => {
+        if (loggedIn === true) {
+            navigate('/')
+        }
+    }, [loggedIn, navigate]);
 
     const handleSingOut = () => {
         setLoggedIn(false)
@@ -177,7 +157,7 @@ export default function App() {
         api
             .editUserInfo(data)
             .then((res) => {
-                setCurrentUser(res);
+                setCurrentUser(res.data);
                 closeAllPopups();
             })
             .catch((err) => {
@@ -192,7 +172,7 @@ export default function App() {
         api
             .editAvatar(data)
             .then((res) => {
-                setCurrentUser(res);
+                setCurrentUser(res.data);
                 closeAllPopups();
             })
             .catch((err) => {
@@ -215,33 +195,55 @@ export default function App() {
             })
             .finally(() => setIsLoading(false));
     };
+    // function handleCardLike(card) {
+    //     const isLiked = card.likes.some(i => i._id === currentUser._id);
+    //     api
+    //         .changeLikeCardStatus(card._id, !isLiked)
+    //         .then((newCard) => {
+    //             setCards((state) =>
+    //                 state.map((c) => (c._id === card._id ? newCard : c))
+    //             );
+    //         })
+    //         .catch((err) => {
+    //             console.log(`Ошибка: ${err}`)
+    //         })
+    // };
     function handleCardLike(card) {
-        const isLiked = card.likes.some(i => i._id === currentUser._id);
+        const isLiked = card.likes.some((i) => i === currentUser._id);
         api
             .changeLikeCardStatus(card._id, !isLiked)
-            .then((newCard) => {
-                setCards((state) =>
-                    state.map((c) => (c._id === card._id ? newCard : c))
-                );
-            })
+            .then(newCard =>
+                setCards((state) => state.map((item) => item._id === card._id ? newCard.data : item))
+            )
             .catch((err) => {
-                console.log(`Ошибка: ${err}`)
-            })
-    };
-    function handleCardDelete() {
-        setIsLoading(true);
-        api
-            .deleteCard(selectedCard._id)
-            .then(() => {
-                setCards((cards) =>
-                    cards.filter((item) => item._id !== selectedCard._id));
-            })
-            .then(() => closeAllPopups())
-            .catch((err) => {
-                console.log(`Ошибка: ${err}`)
-            })
-            .finally(() => setIsLoading(false))
+                console.log(err); // выведем ошибку в консоль
+            });
     }
+
+    // function handleCardDelete() {
+    //     setIsLoading(true);
+    //     api
+    //         .deleteCard(selectedCard._id)
+    //         .then(() => {
+    //             setCards((cards) =>
+    //                 cards.filter((item) => item._id !== selectedCard._id));
+    //         })
+    //         .then(() => closeAllPopups())
+    //         .catch((err) => {
+    //             console.log(`Ошибка: ${err}`)
+    //         })
+    //         .finally(() => setIsLoading(false))
+    // }
+    function handleCardDelete(card) {
+        api.deleteCard(card._id)
+            .then(() => {
+                setCards((state) => state.filter((item) => item._id !== card._id));
+            })
+            .catch((err) => {
+                console.log(err); // выведем ошибку в консоль
+            });
+    }
+    
     return (
         <CurrentUserContext.Provider value={currentUser}>
             <div className="page">

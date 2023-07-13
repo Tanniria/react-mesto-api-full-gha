@@ -9,8 +9,11 @@ export default function Card({
 }) {
     const currentUser = useContext(CurrentUserContext);
     const isOwn = card.owner._id === currentUser._id;
+    // const isOwn = card.owner === currentUser._id;
 
     const isLiked = card.likes.some((item) => item._id === currentUser._id);
+    // const isLiked = card.likes.some((i) => i === currentUser._id);
+
     const cardLikeButtonClassName = `feed__button-like ${isLiked && 'feed__button-like_active'}`;
 
     function handleClick() {

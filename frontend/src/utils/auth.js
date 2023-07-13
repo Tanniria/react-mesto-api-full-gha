@@ -29,14 +29,14 @@ export const login = (data) => {
         },
         body: JSON.stringify({ email, password })
     })
-        .then((response => console.log(response.json())))
-        // .then((data) => {
-        //      if (data.token) {
-        //          localStorage.setItem("jwt", data.token);
-        //          return data;
-        //      }
-        //     return Promise.reject(`Ошибка ${data.status}`)
-        // })
+        .then((response => response.json()))
+        .then((data) => {
+             if (data.token) {
+                 localStorage.setItem("jwt", data.token);
+                 return data;
+             }
+            return Promise.reject(`Ошибка ${data.status}`)
+        })
 };
 
 export const checkToken = () => {

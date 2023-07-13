@@ -5,9 +5,22 @@ const NotFoundError = require('../errors/notFoundError');
 
 const STATUS_CREATED = 201;
 
+// module.exports.createCard = (req, res, next) => {
+//   const { name, link } = req.body;
+//   Card.create({ name, link, owner: req.user._id })
+//     .then((card) => res.status(STATUS_CREATED).send({ data: card }))
+//     .catch((err) => {
+//       if (err.name === 'ValidationError') {
+//         next(new BadRequestError('Переданы некорректные данные'));
+//       } else {
+//         next(err);
+//       }
+//     });
+// };
 module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
-  Card.create({ name, link, owner: req.user._id })
+  const owner = req.user._id;
+  Card.create({ name, link, owner })
     .then((card) => res.status(STATUS_CREATED).send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -25,7 +38,8 @@ module.exports.getCards = (req, res, next) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
-  Card.findById(req.params.cardId)
+  const { cardId } = req.params;
+  Card.findById(cardId)
     .orFail(new NotFoundError('Запрашиваемая карточка не найдена'))
     .then((card) => {
       const owner = card.owner.toString();
