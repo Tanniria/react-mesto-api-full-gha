@@ -125,6 +125,7 @@ export default function App() {
                 navigate("/", { replace: true })
             })
             .catch((err) => {
+                setRegistrationSuccess(false);
                 console.log("Ошибка входа", err);
             })
             handleInfoTooltipClick();
@@ -132,7 +133,6 @@ export default function App() {
 
     useEffect(() => {
         const token = localStorage.getItem('jwt');
-
         if (token) {
             auth
                 .checkToken(token)
@@ -147,15 +147,16 @@ export default function App() {
                 })
         }
     })
+
     // function handleTokenCheck() {
-    //     const jwt = localStorage.getItem("jwt");
-    //     if (jwt) {
+    //     const token = localStorage.getItem("jwt");
+    //     if (token) {
     //         auth
-    //             .checkToken(jwt)
-    //             .then((res) => {
-    //                 if (res) {
+    //             .checkToken(token)
+    //             .then((data) => {
+    //                 if (data) {
     //                     setLoggedIn(true);
-    //                     setUserEmail(res.email);
+    //                     setUserEmail(data.email);
     //                     navigate("/", { replace: true });
     //                 }
     //             })
