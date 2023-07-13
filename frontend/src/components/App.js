@@ -62,7 +62,7 @@ export default function App() {
         setIsConfirmPopupOpen(false);
         setIsInfoTooltipPopupOpen(false);
     };
-    
+
     useEffect(() => {
         if (loggedIn) {
             Promise.all([api.getUserInfo(), api.getInitialCards()])
@@ -75,10 +75,10 @@ export default function App() {
                 });
         }
     }, [loggedIn]);
-    
-    useEffect(() => {
-        handleTokenCheck()
-    }, []);
+
+    // useEffect(() => {
+    //     handleTokenCheck()
+    // }, []);
 
     function handleRegistration({ email, password }) {
         auth
@@ -95,45 +95,79 @@ export default function App() {
             })
     };
 
-    function handleLogin({ password, email }) {
+    // function handleLogin({ password, email }) {
+    //     auth
+    //         .login(password, email)
+    //         .then((data) => {
+    //             if (data.token) {
+    //                 setLoggedIn(true);
+    //                 setUserEmail(email);
+    //                 setRegistrationSuccess(true);
+    //                 handleInfoTooltipClick();
+    //                 navigate("/", { replace: true });
+    //             }
+    //         })
+    //         .catch((err) => {
+    //             setRegistrationSuccess(false);
+    //             handleInfoTooltipClick();
+    //             console.log("Ошибка входа", err);
+    //         })
+    // }
+
+    function handleLogin(password, email) {
         auth
             .login(password, email)
-            .then((data) => {
-                if (data.token) {
-                    setLoggedIn(true);
-                    setUserEmail(email);
-                    setRegistrationSuccess(true);
-                    handleInfoTooltipClick();
-                    navigate("/", { replace: true });
-                }
+            .then((res) => {
+                localStorage.setItem("jwt", res.token);
+                setLoggedIn(true);
+                setUserEmail(email);
+                handleInfoTooltipClick();
+                navigate("/", { replace: true })
             })
             .catch((err) => {
-                setRegistrationSuccess(false);
-                handleInfoTooltipClick();
                 console.log("Ошибка входа", err);
             })
+            handleInfoTooltipClick();
     }
-    function handleTokenCheck() {
-        const token = localStorage.getItem("token");
+
+    useEffect(() => {
+        const token = localStorage.getItem('jwt');
+
         if (token) {
             auth
                 .checkToken(token)
-                .then((res) => {
+                .then(res => {
                     if (res) {
                         setLoggedIn(true);
                         setUserEmail(res.email);
-                        navigate("/", { replace: true });
                     }
                 })
                 .catch((err) => {
-                    console.log("Ошибка валидности токена", err);
-                });
+                    console.log("Ошибка токена", err);
+                })
         }
-    };
+    })
+    // function handleTokenCheck() {
+    //     const jwt = localStorage.getItem("jwt");
+    //     if (jwt) {
+    //         auth
+    //             .checkToken(jwt)
+    //             .then((res) => {
+    //                 if (res) {
+    //                     setLoggedIn(true);
+    //                     setUserEmail(res.email);
+    //                     navigate("/", { replace: true });
+    //                 }
+    //             })
+    //             .catch((err) => {
+    //                 console.log("Ошибка валидности токена", err);
+    //             });
+    //     }
+    // };
 
     const handleSingOut = () => {
         setLoggedIn(false)
-        localStorage.removeItem("token");
+        localStorage.removeItem("jwt");
         navigate("/sign-in");
     };
 

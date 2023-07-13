@@ -4,7 +4,7 @@ const regex = /^(https?:\/\/)?[a-zA-Z\d-]+\.[\w\d\-.~:/?#[\]@!$&'()*+,;=]{2,}#?/
 
 module.exports.validatesignin = celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required().email(),
+    email: Joi.string().email().required(),
     password: Joi.string().required(),
   }),
 });
