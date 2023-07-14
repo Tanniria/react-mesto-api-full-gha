@@ -50,6 +50,7 @@ export default function Main({
                         <Card
                             card={card}
                             key={card._id}
+                            // key = {console.log(card._id)}
                             onCardClick={onCardClick}
                             onCardLike={onCardLike}
                             onCardDelete={onCardDelete} />

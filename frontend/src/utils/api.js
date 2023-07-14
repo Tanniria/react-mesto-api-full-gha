@@ -71,9 +71,11 @@ class Api {
             body: JSON.stringify({
                 name: data.name,
                 link: data.link,
+                
             }),
         })
     };
+
     deleteCard(cardId) {
         const token = localStorage.getItem('jwt');
         return this._request(`${this._url}/cards/${cardId}`, {

@@ -51,15 +51,3 @@ export const checkToken = () => {
         .then((res) => checkResponse(res))
         .then((data) => data);
 };
-// export const checkToken = () => {
-//     const token = localStorage.getItem('jwt');
-  
-//     return fetch(`${BASE_URL}/users/me`, {
-//       method: "GET",
-//       headers: {
-//         "Content-Type": "application/json",
-//         Authorization: `Bearer ${token}`,
-//       },
-//     })
-//     .then(checkResponse)
-//   };
