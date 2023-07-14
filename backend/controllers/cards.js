@@ -7,7 +7,6 @@ const STATUS_CREATED = 201;
 
 module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
-  // const owner = req.user._id;
   Card.create({ name, link, owner: req.user._id })
     .then((card) => res.status(STATUS_CREATED).send({ data: card }))
     .catch((err) => {

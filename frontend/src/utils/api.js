@@ -110,8 +110,8 @@ class Api {
 }
 
 const api = new Api({
-    // url: 'https://api.another.domainname.st.nomoredomains.work',
-    url: 'http://localhost:3000'
+    url: 'https://api.another.domainname.st.nomoredomains.work',
+    // url: 'http://localhost:3000'
 });
 
 export default api;
