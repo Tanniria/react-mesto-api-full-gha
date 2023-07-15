@@ -29,7 +29,6 @@
     "helmet": "^7.0.0",
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^7.2.2",
-    "node-modules": "^1.0.1",
     "validator": "^13.9.0",
     "winston": "^3.9.0"
   }
